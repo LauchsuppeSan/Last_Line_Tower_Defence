@@ -72,3 +72,9 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 Assets/LLTD/
 Last Line Tower Defence/
+Assets/Scripts/Utils/Test.cs
+Assets/Scripts/Utils/Test.cs.meta
+Assets/Scripts/Utils/Test2.cs
+Assets/Scripts/Utils/Test2.cs.meta
+Assets/Scripts/Utils/TestClassDiagram.cd
+Assets/Scripts/Utils/TestClassDiagram.cd.meta
