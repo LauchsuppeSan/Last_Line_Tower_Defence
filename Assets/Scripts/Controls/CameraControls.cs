@@ -17,6 +17,8 @@ public class CameraControls : MonoBehaviour
     [SerializeField]
     float maxPositionZ;
     [SerializeField]
+    float minPositionY;
+    [SerializeField]
     float minZoomDistance;
     [SerializeField]
     float maxZoomDistance;
@@ -174,7 +176,11 @@ public class CameraControls : MonoBehaviour
         RaycastHit hit;
         if (Physics.Linecast(transform.position, Utils.CrawlOverY(transform.position, Vector3.up, -10000), out hit))
         {
-            cameraGroundCrawlerPosition.y = hit.point.y + 3;
+            float newY = hit.point.y + 3;
+            cameraGroundCrawlerPosition.y = 
+                newY < minPositionY
+                ? minPositionY
+                : hit.point.y + 3;
         }
 
         // Set new position
@@ -203,6 +209,9 @@ public class CameraControls : MonoBehaviour
 
     public void Zoom(float zoomInput)
     {
+        if(zoomInput.AlmostEqual(0))
+        { return; }
+
         camera.transform.Translate(camera.transform.forward * zoomInput * zoomSpeed * Time.deltaTime, Space.World);
         Vector3 newLocalCameraPosition = camera.transform.localPosition;
         newLocalCameraPosition.y = Mathf.Clamp(newLocalCameraPosition.y, minZoomDistance, maxZoomDistance);
@@ -250,7 +259,7 @@ public class CameraControls : MonoBehaviour
         if (collisionCheckResult.IsColliding)
         {
             Vector3 offsetNearClipPlaneMidN = (currentNearClipPlaneCenter - collisionCheckResult.clipPlanePoint).normalized;
-            float offsetOnPlaneDist = Vector3.Distance(currentNearClipPlaneCenter, collisionCheckResult.clipPlanePoint);
+            float offsetOnPlaneDist = Vector3.Distance(currentNearClipPlaneCenter, collisionCheckResult.clipPlanePoint)+1;
             Vector3 newCameraPosition = collisionCheckResult.HitPoint + (offsetNearClipPlaneMidN * offsetOnPlaneDist);
             camera.transform.position = newCameraPosition;
         }
@@ -271,6 +280,10 @@ public class CameraControls : MonoBehaviour
                 Vector3 newCameraPosition = collisionCheckResult.HitPoint + (offsetNearClipPlaneMidN * offsetOnPlaneDist);
                 camera.transform.position = newCameraPosition;
             }
+        }
+        else
+        {
+           // Debug.Log($"{camera.transform.localPosition.y} < {currentMaxZoomDist} ");
         }
     }
 

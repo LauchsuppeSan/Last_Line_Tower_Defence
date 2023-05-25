@@ -45,19 +45,17 @@ public static class Utils
     #region Comparer
     public static bool AlmostEqualOrLess(this float a, float b, float tollerance = 0.01f)
     {
-        return Mathf.Abs(a - b) <= tollerance;
+        return a.AlmostEqual(b, tollerance) || a < b;
     }
 
     public static bool AlmostEqualOrGreater(this float a, float b, float tollerance = 0.01f)
     {
-        return Mathf.Abs(a - b) >= tollerance;
+        return a.AlmostEqual(b, tollerance) || a > b;
     }
 
     public static bool AlmostEqual(this float a, float b, float tollerance = 0.01f)
     {
-        return
-            a.AlmostEqualOrLess(b, tollerance)
-            && a.AlmostEqualOrGreater(b, tollerance);
+        return Mathf.Abs(a - b) < tollerance;
     }
 
     #endregion Comparer

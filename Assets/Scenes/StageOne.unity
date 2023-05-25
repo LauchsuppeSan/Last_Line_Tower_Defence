@@ -5437,7 +5437,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3291966310613775046, guid: e2a4f4a823ab4904c9b9b7cc4322b611, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 21
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 3291966310613775046, guid: e2a4f4a823ab4904c9b9b7cc4322b611, type: 3}
       propertyPath: m_LocalPosition.z
@@ -5475,6 +5475,10 @@ PrefabInstance:
       propertyPath: tgs
       value: 
       objectReference: {fileID: 4276063295077273141}
+    - target: {fileID: 5644671716846458884, guid: e2a4f4a823ab4904c9b9b7cc4322b611, type: 3}
+      propertyPath: minPositionY
+      value: 20
+      objectReference: {fileID: 0}
     - target: {fileID: 7373413684447375244, guid: e2a4f4a823ab4904c9b9b7cc4322b611, type: 3}
       propertyPath: m_Name
       value: CameraCrawler
