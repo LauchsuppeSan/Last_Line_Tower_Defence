@@ -30,7 +30,7 @@ public class CameraControls : MonoBehaviour
     float scrollSpeedMultiplier;
     [SerializeField, Range(0.1f, 10.0f)]
     float rotationSpeed;
-    [SerializeField, Range(1000.0f, 10000.0f)]
+    [SerializeField, Range(1000.0f, 30000.0f)]
     float zoomSpeed;
     [SerializeField]
     bool invertHorizontalRotation = false;
@@ -101,8 +101,9 @@ public class CameraControls : MonoBehaviour
         camera.transform.localPosition = Vector3.up * maxZoomDistance;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
+        Zoom(Input.GetAxis("Mouse ScrollWheel"));
         CameraCollisionHandling();
         Rotate();
 
@@ -133,10 +134,10 @@ public class CameraControls : MonoBehaviour
 
     }
 
-    private void Update()
-    {
-        Zoom(Input.GetAxis("Mouse ScrollWheel"));
-    }
+    //private void Update()
+    //{
+    //    Zoom(Input.GetAxis("Mouse ScrollWheel"));
+    //}
 
     private void Move(MovementDirections[] movementDirectionsSequenz)
     {

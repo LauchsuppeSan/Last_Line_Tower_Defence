@@ -1,0 +1,1 @@
+Every typ of every entity that can moving on a path across the grid

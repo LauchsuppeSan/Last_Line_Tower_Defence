@@ -60,7 +60,7 @@ public static class Utils
 
     #endregion Comparer
 
-    #region Usefull algorithms
+    #region Usefull Algorithms
 
     /// <summary>
     /// Combines every item in the given collection with each other
