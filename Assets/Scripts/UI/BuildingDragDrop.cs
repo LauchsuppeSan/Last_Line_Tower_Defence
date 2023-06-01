@@ -12,6 +12,7 @@ public class BuildingDragDrop : MonoBehaviour, IPointerEnterHandler, IPointerExi
     public int currencyCost = 500;
     public Text txt_currency;
     public LayerMask mask;
+    private ScrollRect scrollRect;
 
     private bool isInDragProcess = false;
     private TerrainGridSystem tgs;
@@ -32,12 +33,11 @@ public class BuildingDragDrop : MonoBehaviour, IPointerEnterHandler, IPointerExi
     {
         mainCamera = Camera.main;
         tgs = FindObjectOfType<TerrainGridSystem>();
+        scrollRect = Utils.GetFirstFoundComonentFromAllParents<ScrollRect>(this.transform);
     }
 
     private void Update()
     {
-        Debug.Log("Was soll der scheiss");
-
         if(!isInDragProcess && txt_currency.color != Color.white)
         {
             txt_currency.color = Color.white;
@@ -73,12 +73,14 @@ public class BuildingDragDrop : MonoBehaviour, IPointerEnterHandler, IPointerExi
     private void StartDragProcess()
     {
         isInDragProcess = true;
+        scrollRect.movementType = ScrollRect.MovementType.Clamped;
         spawnedObjectTDragTransform = Instantiate(prefabToSpawn, Vector3.zero, Quaternion.identity).GetComponent<Transform>();
     }
 
     private void PlaceTowerAndEndDragProcess()
     {
         isInDragProcess = false;
+        scrollRect.movementType = ScrollRect.MovementType.Elastic;
         spawnedObjectTDragTransform = null;
         txt_currency.text = $"{GetCurrentAvailabeCurrency() - currencyCost}";
     }
@@ -90,6 +92,7 @@ public class BuildingDragDrop : MonoBehaviour, IPointerEnterHandler, IPointerExi
             Destroy(spawnedObjectTDragTransform.gameObject);
         }
 
+        scrollRect.movementType = ScrollRect.MovementType.Elastic;
         isInDragProcess = false;
     }
 

@@ -203,6 +203,24 @@ public static class Utils
         return foundComponents;
     }
 
+    public static T GetFirstFoundComonentFromAllParents<T>(Transform child) where T : Component
+    {
+        Transform parent = child.parent;
+
+        if(parent == null)
+        {
+            Debug.LogWarning($"Component not found: Object has no parent");
+            return null;
+        }
+
+        if(parent.TryGetComponent<T>(out T foundComponent))
+        {
+            return foundComponent;
+        }
+
+        return GetFirstFoundComonentFromAllParents<T>(parent);
+    }
+
     #endregion
 
     #region Helper

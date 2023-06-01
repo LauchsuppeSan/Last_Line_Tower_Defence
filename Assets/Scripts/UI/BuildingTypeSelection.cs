@@ -7,7 +7,6 @@ public class BuildingTypeSelection : MonoBehaviour
     private static bool isVisible = false;
     private static bool hasActivTween = false;
 
-
     // Update is called once per frame
     void Update()
     {
