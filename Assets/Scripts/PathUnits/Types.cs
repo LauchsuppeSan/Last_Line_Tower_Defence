@@ -20,4 +20,9 @@ public static class Types
         Attacking,
         Destroyed
     }
+
+    public enum DamageType
+    {
+        Explosion
+    }
 }
