@@ -1,6 +1,10 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class Mine : MonoBehaviour
+public class Mine : MonoBehaviour, IActivityBlock
 {
     [SerializeField]
     private GameObject explosionEffectPrefab;
@@ -10,9 +14,14 @@ public class Mine : MonoBehaviour
     private int rawDamagePerExplosion = 10;
     [SerializeField, Range(1,100)]
     private float triggerProbabilityByFullAmmo = 80f;
+    [SerializeField, Tooltip("In Seconds")]
+    private float constructionTime;
 
     private float triggerProbability;
     private float triggerProbabilityDregreaseValue;
+    private bool _blockAllActivities;
+    private Slider inConstructionbar;
+    private GameObject constructionBarObj;
 
     private void Start()
     {
@@ -24,6 +33,18 @@ public class Mine : MonoBehaviour
         // Explosion and ammo settings
         triggerProbability = triggerProbabilityByFullAmmo;
         triggerProbabilityDregreaseValue = triggerProbability / (ammo + 1); // +1 because triggerPropability should never reache a value of 0
+        
+        // WIP
+        // Eigentlich muss jeder turm seine eigene bar haben
+        inConstructionbar = 
+            Utils
+            .GetComonentFromAllChilds<Slider>(this.transform, new List<Slider>())
+            .First(x => x.gameObject.tag == "Constructionbar");
+
+        inConstructionbar.transform.parent.GetComponent<Canvas>().worldCamera = Camera.main;
+        inConstructionbar.maxValue = constructionTime;
+        constructionBarObj = inConstructionbar.gameObject;
+        constructionBarObj.SetActive(false);
     }
 
     private void UpdateTriggerProbability()
@@ -38,6 +59,9 @@ public class Mine : MonoBehaviour
 
     private void OnTriggerEnter(Collider colliderInTrigger)
     {
+        if(blockAllActivities) 
+        { return; }
+
         IDamageableByTowers damageDealer;
         
         // Check if its damageble and cancle if not
@@ -68,5 +92,32 @@ public class Mine : MonoBehaviour
         {
             damageDealer.AddStatus(Types.Status.Slowed, 5f, false);
         }
+    }
+
+    public bool blockAllActivities
+    {
+        get => _blockAllActivities;
+        set => _blockAllActivities = value;
+    }
+
+    public void StartConstructionTimer()
+    {
+        StartCoroutine(ConstructionTimer());
+    }
+
+    private IEnumerator ConstructionTimer()
+    {
+        float elapsedTime = 0;
+        constructionBarObj.SetActive(true);
+
+        while (elapsedTime < constructionTime) 
+        { 
+            yield return new WaitForEndOfFrame();
+            elapsedTime += Time.deltaTime;
+            inConstructionbar.value = elapsedTime;
+        }
+
+        blockAllActivities = false;
+        constructionBarObj.SetActive(false);
     }
 }
