@@ -80,7 +80,7 @@ public class Mine : MonoBehaviour, IActivityBlock
             UpdateLeftoverAmmo();
         }
 
-        Instantiate(explosionEffectPrefab, this.transform.position, Quaternion.identity);
+        Instantiate(explosionEffectPrefab, this.transform.position, Quaternion.Euler(-90f, 0f, 0f));
         
         float damage = damageDealer.CalculateComittedDamage(Types.DamageType.Explosion, rawDamagePerExplosion);
         damageDealer.DegreaseHealth(damage);
