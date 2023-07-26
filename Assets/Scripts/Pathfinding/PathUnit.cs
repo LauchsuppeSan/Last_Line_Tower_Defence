@@ -243,18 +243,19 @@ public class PathUnit : MonoBehaviour, IDamageableByTowers
     /// <param name="toEntireGroup"></param>
     public void AddStatus(Status statusToAdd, float effectDuration, bool toEntireGroup)
     {
-        if(toEntireGroup)
+        if (effectDuration != 0)
+        {
+            StartCoroutine(AddStatusAndRemoveAfterTime(statusToAdd, effectDuration, toEntireGroup));
+            return;
+        }
+
+        if (toEntireGroup)
         {
             group.AddStatusForGroup(statusToAdd);
         }
         else
         {
             group.AddStatusForUnit(statusToAdd, memberIndex);
-        }
-
-        if(effectDuration != 0) 
-        {
-            StartCoroutine(AddStatusAndRemoveAfterTime(statusToAdd, effectDuration, toEntireGroup));
         }
     }
 
@@ -277,7 +278,6 @@ public class PathUnit : MonoBehaviour, IDamageableByTowers
             group.AddStatusForUnit(status, memberIndex);
         }
         
-        // Remove it should be
         if(activTime != 0)
         {
             // Wait the given time

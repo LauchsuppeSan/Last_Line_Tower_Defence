@@ -4,6 +4,7 @@ using UnityEngine;
 using TGS;
 using static Types;
 using Unity.VisualScripting;
+using System.Linq;
 
 public class PathFindingUnitsGroup
 {
@@ -285,6 +286,11 @@ public class PathFindingUnitsGroup
 
             // Remove the status from the member
             statusesList.Remove(statusToRemove);
+
+            if(statusToRemove == Status.Waiting)
+            {
+                statusesList.Add(Status.Moving);
+            }
         }
 
         /// <summary>

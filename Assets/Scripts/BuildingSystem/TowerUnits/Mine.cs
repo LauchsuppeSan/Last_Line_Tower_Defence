@@ -90,7 +90,7 @@ public class Mine : MonoBehaviour, IActivityBlock
         }
         else
         {
-            damageDealer.AddStatus(Types.Status.Slowed, 5f, false);
+            damageDealer.AddStatus(Types.Status.Waiting, 5f, false);
         }
     }
 
