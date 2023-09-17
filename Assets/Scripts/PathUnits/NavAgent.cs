@@ -90,7 +90,8 @@ public class NavAgent : MonoBehaviour
         }
         catch (Exception e)
         {
-            if (e.Message.Contains("contains no elements") == false)
+            if (e.Message.Contains("contains no elements") == false
+                && e.Message.Contains("null") == false)
             { throw e; }
 
             // If no tower in range is found and if current target is >NOT< equal HQ set the HQ as target again

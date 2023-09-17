@@ -27,6 +27,21 @@ public interface IDamageableByTowers
     public bool IsDead();
 
     /// <summary>
+    /// Performes actions in the frame the tower will be deleted
+    /// </summary>
+    public void OnDestroy();
+
+    /// <summary>
+    /// Make sure the tower is not in the list of activ towers in ObjectCollections class
+    /// </summary>
+    public void RemoveSelfFromAgentCollection();
+
+    /// <summary>
+    /// make sure the tower is added to the list of activ towers in  ObjectsCollections class
+    /// </summary>
+    public void AddSelfToAgentCollection();
+
+    /// <summary>
     /// Adds the given status effect to the object and/or its group
     /// </summary>
     /// <param name="statusToAdd">The status effect that should be added</param>

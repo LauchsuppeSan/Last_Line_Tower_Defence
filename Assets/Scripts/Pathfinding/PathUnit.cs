@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using TGS;
+using Unity.VisualScripting;
 using UnityEngine;
 using static Types;
 
@@ -33,7 +34,7 @@ public class PathUnit : MonoBehaviour, IDamageableByTowers
     {
         // Set TerrainGridSystem
         tgs = FindObjectOfType<TerrainGridSystem>();
-
+        
         if (target == null)
         {
             target = GameObject.Find("HQ").transform;
@@ -42,6 +43,8 @@ public class PathUnit : MonoBehaviour, IDamageableByTowers
         // Set start parameters
         currentHealth = fullHealthValue;
         currentHealthDebugView = currentHealth;
+
+        AddSelfToAgentCollection();
 
         // Start pathfinding
         StartCoroutine(CreateFirstPathAfterSpawn());
@@ -295,8 +298,26 @@ public class PathUnit : MonoBehaviour, IDamageableByTowers
         }
     }
 
-    private void OnDestroy()
+    public void OnDestroy()
     {
-        group.RemoveFromGroup(memberIndex);
+        try
+        {
+            group.RemoveFromGroup(memberIndex);
+            RemoveSelfFromAgentCollection();
+        }
+        catch
+        {
+            Debug.LogException(new Exception("Unit is not part of a group"));
+        }
+    }
+
+    public void AddSelfToAgentCollection()
+    {
+        ObjectCollections.Agents.Add(this.gameObject);
+    }
+
+    public void RemoveSelfFromAgentCollection()
+    {
+        ObjectCollections.Agents.Remove(this.gameObject);
     }
 }

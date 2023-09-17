@@ -25,6 +25,8 @@ public class Mine : MonoBehaviour, IActivityBlock
 
     private void Start()
     {
+        ObjectCollections.Towers.Add(this.gameObject);
+
         // Trigger settings
         BoxCollider boxCollider = GetComponent<BoxCollider>();
         boxCollider.size = new Vector3(TGSInfos.cellSize.x * 0.1f, 10, TGSInfos.cellSize.y * 0.1f);
@@ -119,5 +121,10 @@ public class Mine : MonoBehaviour, IActivityBlock
 
         blockAllActivities = false;
         constructionBarObj.SetActive(false);
+    }
+
+    private void OnDestroy()
+    {
+        ObjectCollections.Towers.Remove(this.gameObject);
     }
 }

@@ -144,6 +144,8 @@ public class BuildingDragDrop : MonoBehaviour, IPointerEnterHandler, IPointerExi
         // Activate the construction timer and after its construction time the functionality of the now placed object
         spawnedObjectToDragTransform.GetComponent<IActivityBlock>().StartConstructionTimer();
 
+        ObjectCollections.Towers.Add(spawnedObjectToDragTransform.gameObject);
+
         // Reset currently draged object
         spawnedObjectToDragTransform = null;
        
