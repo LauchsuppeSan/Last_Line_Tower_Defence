@@ -41,7 +41,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4269986045747984488}
-  - component: {fileID: 802029053746073747}
   - component: {fileID: 8340622623277456635}
   - component: {fileID: 1317799863481144544}
   - component: {fileID: 1322247836525070650}
@@ -72,27 +71,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
---- !u!114 &802029053746073747
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4269986045747984489}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a1103a08ee380d439b149a876a49636, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  target: {fileID: 0}
-  movementSettings:
-    movementSpeed: 20
-    rotationSpeed: 5
-    attackRange: 3
-  fullHealthValue: 100
-  defenceAgainstExplosions: 0
-  currentHealthDebugView: 0
-  memberIndex: 0
 --- !u!65 &8340622623277456635
 BoxCollider:
   m_ObjectHideFlags: 0

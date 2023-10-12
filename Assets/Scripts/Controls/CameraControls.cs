@@ -62,7 +62,7 @@ public class CameraControls : MonoBehaviour
     private float horizontalRota;
     private float verticalRota;
     private float currentMaxZoomDist;
-    private new Camera camera;
+    private Camera camera;
 
     public int ScreenBorderThicknessPx => screenBorderThicknessPx;
 

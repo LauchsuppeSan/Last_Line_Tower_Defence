@@ -21,20 +21,32 @@ public class NavAgent : MonoBehaviour
     private Transform mainTarget;
     private Transform currentTarget;
     private bool targetHasChanged;
+    private bool startInitializeCompleted;
 
     private void Start()
     {
+        StartCoroutine(SpawnInitializeProcess());
+    }
+
+    private IEnumerator SpawnInitializeProcess()
+    {
+        yield return new WaitForEndOfFrame();
         agent = GetComponent<ObstacleAgent>();
-        SetTarget(GameObject.FindGameObjectWithTag("MainTarget").transform);
-        mainTarget = currentTarget;
         agent.SetAttackRange(attackRange);
 
         AddSelfToAgentCollection();
+        SetTarget(GameObject.FindGameObjectWithTag("MainTarget").transform);
+        
+        mainTarget = currentTarget;
+        startInitializeCompleted = true;
+
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(!startInitializeCompleted) { return; }
+
         if (targetHasChanged)
         {
             // Make sure the ray will start above the ground
