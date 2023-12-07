@@ -1,16 +1,25 @@
+using JetBrains.Annotations;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TGS;
+using Unity.VisualScripting;
 using UnityEngine;
 using static Types;
 
-public class PathUnit : MonoBehaviour
+public class PathUnit : MonoBehaviour, IDamageableByTowers
 {
     [SerializeField]
-    Transform target;
-
+    public Transform target;
     [SerializeField]
     public PathUnitSettings movementSettings = new PathUnitSettings();
+    [SerializeField]
+    public int fullHealthValue = 100;
+    [SerializeField, Tooltip("Incoming damage from explosions is reduced by the percentage specified here"), Range(0f,100f)]
+    public float defenceAgainstExplosions = 5f;
+
+    [SerializeField]
+    public int currentHealthDebugView;
 
     // Group informations
     [HideInInspector] public PathFindingUnitsGroup group;
@@ -19,17 +28,23 @@ public class PathUnit : MonoBehaviour
     private TerrainGridSystem tgs;
     private bool canCreatePath = false;
     private List<int> path = new List<int>();
-
+    private int currentHealth;
 
     private void Start()
     {
         // Set TerrainGridSystem
         tgs = FindObjectOfType<TerrainGridSystem>();
-
+        
         if (target == null)
         {
             target = GameObject.Find("HQ").transform;
         }
+
+        // Set start parameters
+        currentHealth = fullHealthValue;
+        currentHealthDebugView = currentHealth;
+
+        AddSelfToAgentCollection();
 
         // Start pathfinding
         StartCoroutine(CreateFirstPathAfterSpawn());
@@ -59,7 +74,7 @@ public class PathUnit : MonoBehaviour
 
     private void FollowPath()
     {
-        if (!group.UnitHasStatus(Status.Moving, memberIndex))
+        if (!group.UnitHasStatus(Status.Moving, memberIndex) )
         {
             return;
         }
@@ -107,13 +122,23 @@ public class PathUnit : MonoBehaviour
          * Beschleunigen und abbremsen um so ein natürlicheres fahrverhalten zu erzeugen          *
          ******************************************************************************************/
 
+        float movementSpeed =
+            (group.UnitHasStatus(Status.Waiting, memberIndex),
+             group.UnitHasStatus(Status.LetMemberBehindCatchUp, memberIndex),
+             group.UnitHasStatus(Status.Slowed, memberIndex)) switch
+            {
+                (true, _, _) => 0,
+                (_, true, true) => movementSettings.movementSpeed * 0.2f,
+                (_, true, _) => movementSettings.movementSpeed * 0.3f,
+                (_, _, true) => movementSettings.movementSpeed * 0.5f,
+                _ => movementSettings.movementSpeed,
+            };
+
         // Move pathUnit forward in a speed depending of the slowed status
         transform.position =
             Vector3.MoveTowards(transform.position,
                                 currentTargetCellPosition,
-                                group.UnitHasStatus(Status.LetMemberBehindCatchUp, memberIndex)
-                                ? movementSettings.movementSpeed / 2 * Time.deltaTime
-                                : movementSettings.movementSpeed * Time.deltaTime);
+                                movementSpeed * Time.deltaTime);
 
         // Take the next currentTargetCell if the current target cell is reached and no nextCell is in queue
         if (distToCurrentTargetCell < 0.1)
@@ -121,6 +146,21 @@ public class PathUnit : MonoBehaviour
             path.RemoveAt(0);
             needNextCell = true;
         }
+    }
+
+    private float GetMovementSpeedByConsiderStatusEffects()
+    {
+        return 
+            (group.UnitHasStatus(Status.Waiting, memberIndex),
+             group.UnitHasStatus(Status.LetMemberBehindCatchUp, memberIndex),
+             group.UnitHasStatus(Status.Slowed, memberIndex)) switch
+            {
+                (true, _, _) => 0,
+                (_, true, true) => movementSettings.movementSpeed * 0.2f,
+                (_, true, _) => movementSettings.movementSpeed * 0.3f,
+                (_, _, true) => movementSettings.movementSpeed * 0.5f,
+                _ => movementSettings.movementSpeed,
+            };
     }
 
     /// <summary>
@@ -145,9 +185,139 @@ public class PathUnit : MonoBehaviour
 
     private IEnumerator CreateFirstPathAfterSpawn()
     {
-        // Make sure this will called after the GridStartManager is finished
+        // Make sure this will called after the GridStartManager is finished by waiting two frames
         yield return new WaitForEndOfFrame();
         yield return new WaitForEndOfFrame();
         canCreatePath = true;
+    }
+
+
+
+
+
+
+    /// <summary>
+    /// Reduces the incoming raw damage by the percentage the unit has a defence against this kind of damage and returns the real damage value
+    /// </summary>
+    /// <param name="damageType"></param>
+    /// <param name="incomingRawDamage"></param>
+    /// <returns></returns>
+    public float CalculateComittedDamage(DamageType damageType, float incomingRawDamage)
+    {
+        Func<float, float> onePercentOfIncoming =
+            rawIncomming => incomingRawDamage * 0.01f;
+
+        Func<float, float> wantedPercentageOfDamage =
+            defPercentage => 100f - defPercentage;
+
+        return
+            damageType switch
+            {
+                DamageType.Explosion => onePercentOfIncoming(incomingRawDamage) * wantedPercentageOfDamage(defenceAgainstExplosions),
+                _ => incomingRawDamage
+            };
+    }
+
+    /// <summary>
+    /// Degreas the current health of the unit by the given value
+    /// </summary>
+    /// <param name="reductionValue"></param>
+    public void DegreaseHealth(float reductionValue)
+    {
+        currentHealth -= (int) reductionValue;
+        currentHealthDebugView = currentHealth;
+    }
+
+    /// <summary>
+    /// Checks if the health of the unit is 0 or less
+    /// </summary>
+    /// <returns>true: Unit is dead
+    ///          <br>false: Unit is alive</br></returns>
+    public bool IsDead()
+    {
+        return currentHealth <= 0;
+    }
+
+    /// <summary>
+    /// Adds a status effect to the path unit or its entire grupe for the given amound of time sin secondes (0 means permanent status)
+    /// </summary>
+    /// <param name="statusToAdd"></param>
+    /// <param name="effectDuration">Status activ time. 0 means endless</param>
+    /// <param name="toEntireGroup"></param>
+    public void AddStatus(Status statusToAdd, float effectDuration, bool toEntireGroup)
+    {
+        if (effectDuration != 0)
+        {
+            StartCoroutine(AddStatusAndRemoveAfterTime(statusToAdd, effectDuration, toEntireGroup));
+            return;
+        }
+
+        if (toEntireGroup)
+        {
+            group.AddStatusForGroup(statusToAdd);
+        }
+        else
+        {
+            group.AddStatusForUnit(statusToAdd, memberIndex);
+        }
+    }
+
+    /// <summary>
+    /// Adds a given status to the unit or its enire group and removes it after time if activtime is not 0
+    /// </summary>
+    /// <param name="status">Status to add</param>
+    /// <param name="activTime">Time between add and remove of the status (0 means permanent status)</param>
+    /// <param name="entireGroup">Entire group or just unit status</param>
+    /// <returns></returns>
+    private IEnumerator AddStatusAndRemoveAfterTime(Status status, float activTime, bool entireGroup)
+    {
+        // Add status to unit or entire group
+        if (entireGroup)
+        {
+            group.AddStatusForGroup(status);
+        }
+        else
+        {
+            group.AddStatusForUnit(status, memberIndex);
+        }
+        
+        if(activTime != 0)
+        {
+            // Wait the given time
+            yield return new WaitForSeconds(activTime);
+
+            // Remove status from unit or entire group
+            if (entireGroup)
+            {
+                group.RemoveStatusFromGroup(status);
+            }
+            else
+            {
+                group.RemoveStatusFromUnit(status, memberIndex);
+            }
+        }
+    }
+
+    public void OnDestroy()
+    {
+        try
+        {
+            group.RemoveFromGroup(memberIndex);
+            RemoveSelfFromAgentCollection();
+        }
+        catch
+        {
+            Debug.LogException(new Exception("Unit is not part of a group"));
+        }
+    }
+
+    public void AddSelfToAgentCollection()
+    {
+        ObjectCollections.Agents.Add(this.gameObject);
+    }
+
+    public void RemoveSelfFromAgentCollection()
+    {
+        ObjectCollections.Agents.Remove(this.gameObject);
     }
 }
