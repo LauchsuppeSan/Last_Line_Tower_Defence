@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using TGS;
 using static Types;
-using Unity.VisualScripting;
-using System.Linq;
 
 public class PathFindingUnitsGroup
 {
@@ -55,7 +53,7 @@ public class PathFindingUnitsGroup
     /// <param name="memberIndex">Member to remove</param>
     public void RemoveFromGroup(int memberIndex)
     {
-        if(memberIndex < group.Count)
+        if(memberIndex == 0 && memberIndex <= group.Count)
         {
             (UnitInformation Statuses, PathUnit Unit) memberToDelet = group.Find(member => member.Unit.memberIndex == memberIndex);
             
@@ -65,13 +63,6 @@ public class PathFindingUnitsGroup
             int listIndexToDelete = group.IndexOf(memberToDelet);
 
             group.RemoveAt(listIndexToDelete);
-
-            allGroupMembersBehindDeletedMember.ForEach(member => member.Unit.memberIndex--);
-
-        }
-        else
-        {
-            Debug.LogError($"Unable to remove group member with index {memberIndex}: Group hast just{group.Count} members");
         }
     }
 
@@ -143,8 +134,6 @@ public class PathFindingUnitsGroup
         // If member has no forward member return -1
         if(memberIndex == 0)
         { return -1; }
-
-        // vermutlich wird dashier ausgeführ bevor der kaputte aus der gruppe entfehrnt und alle dahinter nach vorne versetzt werden
 
         // Get member and forward member positions with the same height level
         Vector3 memberPosition = group[memberIndex].Unit.gameObject.transform.position.PojectOnY(0);
@@ -286,11 +275,6 @@ public class PathFindingUnitsGroup
 
             // Remove the status from the member
             statusesList.Remove(statusToRemove);
-
-            if(statusToRemove == Status.Waiting)
-            {
-                statusesList.Add(Status.Moving);
-            }
         }
 
         /// <summary>

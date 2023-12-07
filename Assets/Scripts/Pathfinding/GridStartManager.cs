@@ -21,8 +21,6 @@ public class GridStartManager : MonoBehaviour
         {
             SetMovementPercentage(tgs);
         }
-
-        TGSInfos.SetTGSInfos(tgs);
     }
 
     /// <summary>

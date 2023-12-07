@@ -19,12 +19,12 @@ public class GroupSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(WaitSecundes(5f));
+        StartCoroutine(Wait5Secundes());
     }
 
-    IEnumerator WaitSecundes(float seconds)
+    IEnumerator Wait5Secundes()
     {
-        yield return new WaitForSeconds(seconds);
+        yield return new WaitForSeconds(5);
         
         // Get tgs and the center of the cell the spawner is inside as spawn position
         tgs = FindObjectOfType<TerrainGridSystem>();

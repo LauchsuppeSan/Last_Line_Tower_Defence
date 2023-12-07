@@ -6,9 +6,6 @@ TagManager:
   tags:
   - Ground
   - Walkable
-  - PathUnit
-  - Constructionbar
-  - MainTarget
   layers:
   - Default
   - TransparentFX

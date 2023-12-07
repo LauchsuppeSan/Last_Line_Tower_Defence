@@ -203,7 +203,7 @@ public static class Utils
         return foundComponents;
     }
 
-    public static T GetFirstFoundComponentFromAllParents<T>(Transform child) where T : Component
+    public static T GetFirstFoundComonentFromAllParents<T>(Transform child) where T : Component
     {
         Transform parent = child.parent;
 
@@ -218,7 +218,7 @@ public static class Utils
             return foundComponent;
         }
 
-        return GetFirstFoundComponentFromAllParents<T>(parent);
+        return GetFirstFoundComonentFromAllParents<T>(parent);
     }
 
     #endregion
